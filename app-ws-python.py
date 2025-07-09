@@ -11,14 +11,19 @@ RABBITMQ_URL = os.environ.get('RABBITMQ_URL', 'amqps://smzjygvv:ZZnn9lC-qQHQlOy3
 QUEUE_NAME = 'fila_exemplo'
 
 # Conecta ao RabbitMQ uma vez no início
-params = pika.URLParameters(RABBITMQ_URL)
-connection = pika.BlockingConnection(params)
-channel = connection.channel()
-channel.queue_declare(queue=QUEUE_NAME, durable=True)
+#params = pika.URLParameters(RABBITMQ_URL)
+#connection = pika.BlockingConnection(params)
+#channel = connection.channel()
+#channel.queue_declare(queue=QUEUE_NAME, durable=True)
 
 @app.route('/publicar', methods=['POST'])
 def publicar():
     data = request.get_json()
+
+    params = pika.URLParameters(RABBITMQ_URL)
+    connection = pika.BlockingConnection(params)
+    channel = connection.channel()
+    channel.queue_declare(queue=QUEUE_NAME, durable=True)
 
     #if not data or 'mensagem' not in data:
     #    return jsonify({'erro': 'Campo "mensagem" é obrigatório'}), 400
