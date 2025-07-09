@@ -3,5 +3,5 @@ services:
     name: app-ws-python
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app-ws-python:app
     plan: free
