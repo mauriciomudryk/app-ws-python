@@ -1,10 +1,11 @@
 import json
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, CORS
 import pika
 import os
 
 app = Flask(__name__)
+CORS(app, origins=["*"])
 
 # Configuração do RabbitMQ (substitua pela sua URL do CloudAMQP ou local)
 RABBITMQ_URL = os.environ.get('RABBITMQ_URL', 'amqps://smzjygvv:ZZnn9lC-qQHQlOy3jR1JQ1_prAOyebu4@horse.lmq.cloudamqp.com/smzjygvv')
