@@ -26,10 +26,11 @@ def publicar():
     connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE_NAME, durable=True)
-
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     #if not data or 'mensagem' not in data:
     #    return jsonify({'erro': 'Campo "mensagem" é obrigatório'}), 400
 
+    data['ip'] = ip
     #mensagem = data['mensagem']
     mensagem = json.dumps(data)
     try:
