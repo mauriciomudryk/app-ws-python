@@ -1,9 +1,11 @@
 import json
+import uuid
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
 import pika
 import os
+import time
 
 app = Flask(__name__)
 CORS(app, origins=["*"])
@@ -18,9 +20,24 @@ QUEUE_NAME = 'fila_exemplo'
 #channel = connection.channel()
 #channel.queue_declare(queue=QUEUE_NAME, durable=True)
 
+@app.route('/sse')
+def sse():
+    def event_stream():
+        while True:
+            data = {"time": time.strftime("%H:%M:%S")}
+            yield f"data: {json.dumps(data)}\n\n"
+            time.sleep(20)
+            break
+
+    return Response(
+        stream_with_context(event_stream()),
+        content_type='text/event-stream'
+    )
+
 @app.route('/publicar', methods=['POST'])
 def publicar():
     data = request.get_json()
+    print(data)
 
     params = pika.URLParameters(RABBITMQ_URL)
     connection = pika.BlockingConnection(params)
@@ -31,6 +48,7 @@ def publicar():
     #    return jsonify({'erro': 'Campo "mensagem" é obrigatório'}), 400
 
     data['ip'] = ip
+    data['uuid'] = str(uuid.uuid4())
     #mensagem = data['mensagem']
     mensagem = json.dumps(data)
     try:
@@ -45,4 +63,4 @@ def publicar():
         return jsonify({'erro': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, threaded=True)
