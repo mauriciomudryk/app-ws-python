@@ -6,6 +6,7 @@ from flask_cors import CORS
 import pika
 import os
 import time
+from br.com.ia.ws.services.app_service import Service
 
 app = Flask(__name__)
 CORS(app, origins=["*"])
@@ -37,7 +38,7 @@ def sse():
 @app.route('/publicar', methods=['POST'])
 def publicar():
     data = request.get_json()
-    print(data)
+    #print(data)
 
     params = pika.URLParameters(RABBITMQ_URL)
     connection = pika.BlockingConnection(params)
@@ -51,6 +52,10 @@ def publicar():
     data['uuid'] = str(uuid.uuid4())
     #mensagem = data['mensagem']
     mensagem = json.dumps(data)
+
+    service = Service();
+    service.upload(data)
+
     try:
         channel.basic_publish(
             exchange='',
